@@ -80,18 +80,18 @@ export function ProductModal({
 
   return (
     <Modal open={Boolean(bouquet)} title={bouquet.title} onClose={onClose} wide>
-      <div className="grid gap-6 p-5 lg:grid-cols-[0.95fr_1.05fr] lg:p-6">
+      <div className="grid gap-4 p-4 lg:grid-cols-[0.95fr_1.05fr] lg:gap-6 lg:p-6">
         <div className="overflow-hidden rounded-[8px] bg-milk">
-          <img alt={bouquet.title} className="h-full min-h-[420px] w-full object-cover" decoding="async" fetchPriority="high" src={bouquet.image} />
+          <img alt={bouquet.title} className="h-72 w-full object-cover sm:h-96 lg:h-full lg:min-h-[420px]" decoding="async" fetchPriority="high" src={bouquet.image} />
         </div>
 
-        <div className="grid gap-5">
+        <div className="grid gap-4 sm:gap-5">
           <div>
             <p className="mb-2 text-sm uppercase text-wine/70">
               {bouquet.type === "bouquet" ? "Готовый букет" : "Цветы"} · {bouquet.category}
             </p>
             <div className="flex flex-wrap items-end justify-between gap-3">
-              <h3 className="font-serif text-4xl text-ink">{bouquet.title}</h3>
+              <h3 className="font-serif text-3xl text-ink sm:text-4xl">{bouquet.title}</h3>
               <strong className="text-2xl text-wine">{formatPrice(price)}</strong>
             </div>
             <p className="mt-3 leading-7 text-ink/68">{bouquet.description}</p>
@@ -143,7 +143,7 @@ export function ProductModal({
             </fieldset>
           </div>
 
-          <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="grid gap-2 sm:flex-row md:flex">
             <PrimaryButton onClick={() => onAdd(item)}>
               <ShoppingBag size={17} />
               {editingItem ? "Сохранить изменения" : "Добавить в корзину"}

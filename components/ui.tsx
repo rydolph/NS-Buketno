@@ -33,7 +33,7 @@ export function Modal({ open, title, onClose, children, wide }: ModalProps) {
       {open ? (
         <motion.div
           aria-modal="true"
-          className="fixed inset-0 z-50 grid place-items-center bg-ink/45 p-3 sm:p-6"
+          className="fixed inset-0 z-50 grid place-items-end bg-ink/45 p-0 sm:place-items-center sm:p-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -42,8 +42,8 @@ export function Modal({ open, title, onClose, children, wide }: ModalProps) {
           onMouseDown={onClose}
         >
           <motion.div
-            className={`max-h-[92vh] w-full overflow-hidden rounded-[8px] bg-cream shadow-soft outline-none will-change-transform ${
-              wide ? "max-w-6xl" : "max-w-xl"
+            className={`max-h-[96vh] w-full overflow-hidden rounded-t-[8px] bg-cream shadow-soft outline-none will-change-transform sm:max-h-[92vh] sm:rounded-[8px] ${
+              wide ? "sm:max-w-6xl" : "sm:max-w-xl"
             }`}
             initial={{ y: 24, opacity: 0, scale: 0.98 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
@@ -52,8 +52,8 @@ export function Modal({ open, title, onClose, children, wide }: ModalProps) {
             onMouseDown={(event) => event.stopPropagation()}
             tabIndex={-1}
           >
-            <div className="flex items-center justify-between border-b border-wine/10 px-5 py-4 sm:px-6">
-              <h2 className="font-serif text-2xl text-ink">{title}</h2>
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-wine/10 bg-cream px-4 py-3 sm:px-6 sm:py-4">
+              <h2 className="truncate pr-4 font-serif text-2xl text-ink">{title}</h2>
               <button
                 aria-label="Закрыть"
                 className="grid size-10 place-items-center rounded-full text-ink transition hover:bg-rose/15 focus:outline-none focus:ring-2 focus:ring-wine/30"
@@ -63,7 +63,7 @@ export function Modal({ open, title, onClose, children, wide }: ModalProps) {
                 <X size={20} />
               </button>
             </div>
-            <div className="max-h-[calc(92vh-73px)] overflow-y-auto">{children}</div>
+            <div className="max-h-[calc(96vh-65px)] overflow-y-auto sm:max-h-[calc(92vh-73px)]">{children}</div>
           </motion.div>
         </motion.div>
       ) : null}
@@ -109,7 +109,7 @@ export function PrimaryButton({
 }) {
   return (
     <button
-      className="inline-flex min-h-10 items-center justify-center gap-2 rounded-full bg-wine px-4 py-2 text-[13px] font-semibold leading-tight text-white shadow-petal transition hover:bg-[#69233a] focus:outline-none focus:ring-2 focus:ring-wine/35 disabled:cursor-not-allowed disabled:opacity-55 sm:min-h-11 sm:px-5 sm:text-sm"
+      className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full bg-wine px-3 py-2 text-[12px] font-semibold leading-tight text-white shadow-petal transition hover:bg-[#69233a] focus:outline-none focus:ring-2 focus:ring-wine/35 disabled:cursor-not-allowed disabled:opacity-55 sm:min-h-11 sm:gap-2 sm:px-5 sm:text-sm"
       disabled={disabled}
       onClick={onClick}
       type={type}
@@ -130,7 +130,7 @@ export function SecondaryButton({
 }) {
   return (
     <button
-      className="inline-flex min-h-10 items-center justify-center gap-2 rounded-full border border-wine/15 bg-white/70 px-4 py-2 text-[13px] font-semibold leading-tight text-ink transition hover:bg-rose/15 focus:outline-none focus:ring-2 focus:ring-wine/30 sm:min-h-11 sm:px-5 sm:text-sm"
+      className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full border border-wine/15 bg-white/70 px-3 py-2 text-[12px] font-semibold leading-tight text-ink transition hover:bg-rose/15 focus:outline-none focus:ring-2 focus:ring-wine/30 sm:min-h-11 sm:gap-2 sm:px-5 sm:text-sm"
       onClick={onClick}
       type={type}
     >

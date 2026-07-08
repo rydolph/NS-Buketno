@@ -28,11 +28,11 @@ export function ProfileModal({ open, user, onClose, onUpdate, onLogout, onRepeat
 
   return (
     <Modal open={open} title="Профиль" onClose={onClose} wide>
-      <div className="grid gap-5 p-5 lg:grid-cols-[250px_1fr] lg:p-6">
-        <aside className="grid content-start gap-2">
+      <div className="grid gap-4 p-4 lg:grid-cols-[250px_1fr] lg:gap-5 lg:p-6">
+        <aside className="scrollbar-none flex gap-2 overflow-x-auto pb-1 lg:grid lg:content-start lg:overflow-visible lg:pb-0">
           {tabs.map((item) => (
             <button
-              className={`rounded-[8px] px-4 py-3 text-left text-sm transition ${tab === item ? "bg-wine text-white" : "bg-white text-ink hover:bg-rose/15"}`}
+              className={`shrink-0 rounded-[8px] px-4 py-3 text-left text-sm transition ${tab === item ? "bg-wine text-white" : "bg-white text-ink hover:bg-rose/15"}`}
               key={item}
               onClick={() => setTab(item)}
               type="button"
@@ -41,7 +41,7 @@ export function ProfileModal({ open, user, onClose, onUpdate, onLogout, onRepeat
             </button>
           ))}
           <button
-            className="mt-3 inline-flex items-center gap-2 rounded-[8px] bg-milk px-4 py-3 text-left text-sm text-wine"
+            className="inline-flex shrink-0 items-center gap-2 rounded-[8px] bg-milk px-4 py-3 text-left text-sm text-wine lg:mt-3"
             onClick={() => {
               onLogout();
               onClose();
@@ -56,7 +56,7 @@ export function ProfileModal({ open, user, onClose, onUpdate, onLogout, onRepeat
         <AnimatePresence mode="wait">
           <motion.section
             animate={{ opacity: 1, y: 0 }}
-            className="min-h-[420px] rounded-[8px] bg-milk p-5"
+            className="min-h-[360px] rounded-[8px] bg-milk p-4 sm:p-5 lg:min-h-[420px]"
             exit={{ opacity: 0, y: 8 }}
             initial={{ opacity: 0, y: 8 }}
             key={tab}

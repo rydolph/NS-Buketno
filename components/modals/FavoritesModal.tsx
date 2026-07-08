@@ -19,7 +19,7 @@ export function FavoritesModal({ open, favoriteIds, onClose, onAdd, onOpen, onTo
 
   return (
     <Modal open={open} title="Избранное" onClose={onClose} wide>
-      <div className="grid gap-4 p-5 sm:grid-cols-2 lg:grid-cols-3 lg:p-6">
+      <div className="grid gap-3 p-4 min-[520px]:grid-cols-2 sm:gap-4 lg:grid-cols-3 lg:p-6">
         {items.length ? (
           items.map((item) => (
             <article className="overflow-hidden rounded-[8px] bg-white shadow-soft" key={item.id}>
@@ -40,9 +40,9 @@ export function FavoritesModal({ open, favoriteIds, onClose, onAdd, onOpen, onTo
                   <Heart size={17} fill="currentColor" />
                 </button>
               </div>
-              <div className="grid gap-3 p-4">
+              <div className="grid gap-3 p-3 sm:p-4">
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-serif text-2xl text-ink">{item.title}</h3>
+                  <h3 className="truncate font-serif text-xl text-ink sm:text-2xl" title={item.title}>{item.title}</h3>
                   <strong className="text-sm text-wine">{formatPrice(item.price)}</strong>
                 </div>
                 <PrimaryButton onClick={() => onAdd(item)}>

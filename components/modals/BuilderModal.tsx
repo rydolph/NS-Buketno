@@ -47,13 +47,13 @@ export function BuilderModal({ open, onClose, onAdd }: BuilderModalProps) {
 
   return (
     <Modal open={open} title="Собрать букет" onClose={onClose} wide>
-      <div className="grid gap-5 p-5 lg:grid-cols-[1fr_0.9fr_0.85fr] lg:p-6">
+      <div className="grid gap-4 p-4 lg:grid-cols-[1fr_0.9fr_0.85fr] lg:gap-5 lg:p-6">
         <section className="grid gap-3">
           <h3 className="font-serif text-2xl text-ink">Цветы</h3>
           <div className="grid gap-2">
             {stems.map((stem) => (
-              <article className="grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-[8px] bg-white p-3" key={stem.id}>
-                <div className="relative size-12 overflow-hidden rounded-[8px] border-4 border-cream">
+              <article className="grid grid-cols-[auto_1fr] items-center gap-3 rounded-[8px] bg-white p-3 min-[430px]:grid-cols-[auto_1fr_auto]" key={stem.id}>
+                <div className="relative size-11 overflow-hidden rounded-[8px] border-4 border-cream sm:size-12">
                   <img alt={stem.name} className="size-full object-cover" decoding="async" loading="lazy" src={stem.image} />
                   <span className="absolute bottom-0 right-0 size-4 rounded-full border border-white" style={{ background: stem.color }} />
                 </div>
@@ -63,7 +63,7 @@ export function BuilderModal({ open, onClose, onAdd }: BuilderModalProps) {
                     {stem.note} · {formatPrice(stem.price)}
                   </p>
                 </div>
-                <div className="flex items-center rounded-full bg-milk p-1">
+                <div className="col-span-2 flex w-fit items-center rounded-full bg-milk p-1 min-[430px]:col-span-1">
                   <button
                     aria-label={`Уменьшить ${stem.name}`}
                     className="grid size-8 place-items-center rounded-full bg-white text-ink"
@@ -105,7 +105,7 @@ export function BuilderModal({ open, onClose, onAdd }: BuilderModalProps) {
 
           <div className="grid gap-3">
             <h3 className="font-serif text-2xl text-ink">Дополнительно</h3>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid gap-2 min-[420px]:grid-cols-2">
               {addons.map((addon) => {
                 const active = selectedAddons.includes(addon.id);
                 return (

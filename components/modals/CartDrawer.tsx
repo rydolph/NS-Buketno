@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, Trash2, X } from "lucide-react";
 import { formatPrice } from "@/lib/mock-data";
-import { Field, PrimaryButton, SecondaryButton } from "@/components/ui";
+import { Field } from "@/components/ui";
 import type { CartItem } from "@/types/shop";
 import { useEffect, useState } from "react";
 
@@ -49,14 +49,14 @@ export function CartDrawer({ open, cart, total, onClose, onCheckout, onEdit, onQ
         >
           <motion.aside
             aria-label="Корзина"
-            className="ml-auto flex h-full w-full max-w-md flex-col bg-cream shadow-soft will-change-transform"
+            className="ml-auto flex h-full min-h-0 w-full flex-col bg-cream shadow-soft will-change-transform sm:max-w-md"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.24, ease: "easeOut" }}
             onMouseDown={(event) => event.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-wine/10 p-5">
+            <div className="flex items-center justify-between border-b border-wine/10 p-4 sm:p-5">
               <h2 className="font-serif text-3xl text-ink">Корзина</h2>
               <button
                 aria-label="Закрыть корзину"
@@ -68,12 +68,12 @@ export function CartDrawer({ open, cart, total, onClose, onCheckout, onEdit, onQ
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-5">
+            <div className="min-h-0 flex-1 overflow-y-auto p-3 sm:p-5">
               {cart.length ? (
                 <div className="grid gap-4">
                   {cart.map((item) => (
                     <article
-                      className="grid cursor-pointer grid-cols-[84px_1fr] gap-3 rounded-[8px] bg-white p-3 transition hover:bg-rose/10 focus-within:ring-2 focus-within:ring-wine/20"
+                      className="grid cursor-pointer grid-cols-[72px_1fr] gap-3 rounded-[8px] bg-white p-3 transition hover:bg-rose/10 focus-within:ring-2 focus-within:ring-wine/20 sm:grid-cols-[84px_1fr]"
                       key={item.id}
                       onClick={() => onEdit(item)}
                       onKeyDown={(event) => {
@@ -85,7 +85,7 @@ export function CartDrawer({ open, cart, total, onClose, onCheckout, onEdit, onQ
                       role="button"
                       tabIndex={0}
                     >
-                      <img alt={item.title} className="size-20 rounded-[8px] object-cover" decoding="async" loading="lazy" src={item.image} />
+                      <img alt={item.title} className="size-[72px] rounded-[8px] object-cover sm:size-20" decoding="async" loading="lazy" src={item.image} />
                       <div className="grid gap-2">
                         <div className="flex items-start justify-between gap-2">
                           <div>
@@ -128,7 +128,7 @@ export function CartDrawer({ open, cart, total, onClose, onCheckout, onEdit, onQ
               )}
             </div>
 
-            <div className="grid gap-4 border-t border-wine/10 p-5">
+            <div className="shrink-0 grid gap-3 border-t border-wine/10 bg-cream p-4 sm:gap-4 sm:p-5">
               <Field label="Промокод" onChange={setPromo} placeholder="Попробуйте BUKET10" value={promo} />
               <div className="grid gap-2 text-sm">
                 <div className="flex justify-between text-ink/65">
@@ -144,8 +144,21 @@ export function CartDrawer({ open, cart, total, onClose, onCheckout, onEdit, onQ
                   <span>{formatPrice(total - discount)}</span>
                 </div>
               </div>
-              <PrimaryButton disabled={!cart.length} onClick={onCheckout}>Оформить заказ</PrimaryButton>
-              <SecondaryButton onClick={onClose}>Продолжить покупки</SecondaryButton>
+              <button
+                className="h-12 w-full rounded-[8px] bg-wine px-4 text-sm font-semibold text-white shadow-petal transition hover:bg-[#69233a] focus:outline-none focus:ring-2 focus:ring-wine/35 disabled:cursor-not-allowed disabled:opacity-55"
+                disabled={!cart.length}
+                onClick={onCheckout}
+                type="button"
+              >
+                Оформить заказ
+              </button>
+              <button
+                className="h-12 w-full rounded-[8px] border border-wine/15 bg-white px-4 text-sm font-semibold text-ink transition hover:bg-rose/15 focus:outline-none focus:ring-2 focus:ring-wine/30"
+                onClick={onClose}
+                type="button"
+              >
+                Продолжить покупки
+              </button>
             </div>
           </motion.aside>
         </motion.div>

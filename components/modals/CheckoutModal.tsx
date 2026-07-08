@@ -44,10 +44,10 @@ export function CheckoutModal({ open, user, total, onClose, onPay }: CheckoutMod
   return (
     <Modal open={open} title={success ? "Заказ оформлен" : "Оформление заказа"} onClose={onClose} wide>
       {success ? (
-        <div className="grid place-items-center gap-4 p-8 text-center">
+        <div className="grid place-items-center gap-4 p-5 text-center sm:p-8">
           <CheckCircle2 className="text-sage" size={64} />
           <div>
-            <h3 className="font-serif text-4xl text-ink">Спасибо за заказ</h3>
+            <h3 className="font-serif text-3xl text-ink sm:text-4xl">Спасибо за заказ</h3>
             <p className="mt-3 text-ink/65">
               Заказ {success.id} сохранен в истории профиля. Mock-оплата прошла успешно.
             </p>
@@ -55,7 +55,7 @@ export function CheckoutModal({ open, user, total, onClose, onPay }: CheckoutMod
           <PrimaryButton onClick={onClose}>Вернуться в каталог</PrimaryButton>
         </div>
       ) : (
-        <form className="grid gap-6 p-5 lg:grid-cols-[1fr_360px] lg:p-6" onSubmit={submit}>
+        <form className="grid gap-4 p-4 lg:grid-cols-[1fr_360px] lg:gap-6 lg:p-6" onSubmit={submit}>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Имя" onChange={setName} required value={name} />
             <Field label="Телефон" onChange={setPhone} required value={phone} />
@@ -77,8 +77,8 @@ export function CheckoutModal({ open, user, total, onClose, onPay }: CheckoutMod
             <Textarea label="Комментарий к заказу" onChange={setComment} placeholder="Время, домофон, пожелания флористу" value={comment} />
           </div>
 
-          <aside className="grid content-start gap-4 rounded-[8px] bg-milk p-5">
-            <h3 className="font-serif text-3xl text-ink">Итог</h3>
+          <aside className="grid content-start gap-4 rounded-[8px] bg-milk p-4 sm:p-5">
+            <h3 className="font-serif text-2xl text-ink sm:text-3xl">Итог</h3>
             <div className="flex justify-between border-b border-wine/10 pb-3 text-sm text-ink/65">
               <span>Оплата</span>
               <span>{payment}</span>

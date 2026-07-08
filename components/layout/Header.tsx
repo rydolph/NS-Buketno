@@ -24,15 +24,15 @@ export function Header({
 }: HeaderProps) {
   return (
     <header className="sticky top-0 z-30 border-b border-wine/10 bg-milk/90 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-3 py-3 sm:flex-nowrap sm:px-6 sm:py-4 lg:px-8">
           <button
-            className="text-left focus:outline-none focus:ring-2 focus:ring-wine/30"
+            className="min-w-0 text-left focus:outline-none focus:ring-2 focus:ring-wine/30"
             type="button"
           >
-            <span className="block font-serif text-2xl leading-none text-wine sm:text-3xl">НС Букетно</span>
+            <span className="block truncate font-serif text-[1.7rem] leading-none text-wine sm:text-3xl">НС Букетно</span>
           </button>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <span id="builder">
               <PrimaryButton onClick={onBuilder}>
               <Sparkles size={17} />
@@ -41,7 +41,7 @@ export function Header({
             </span>
             <button
               aria-label={`Открыть избранное, товаров: ${favoriteCount}`}
-              className="relative grid size-11 place-items-center rounded-full bg-white text-ink shadow-sm transition hover:bg-rose/15 focus:outline-none focus:ring-2 focus:ring-wine/30"
+              className="relative grid size-10 place-items-center rounded-full bg-white text-ink shadow-sm transition hover:bg-rose/15 focus:outline-none focus:ring-2 focus:ring-wine/30 sm:size-11"
               onClick={onFavorites}
               type="button"
             >
@@ -54,7 +54,7 @@ export function Header({
             </button>
             <button
               aria-label={`Открыть корзину, товаров: ${cartCount}`}
-              className="relative grid size-11 place-items-center rounded-full bg-white text-ink shadow-sm transition hover:bg-rose/15 focus:outline-none focus:ring-2 focus:ring-wine/30"
+              className="relative grid size-10 place-items-center rounded-full bg-white text-ink shadow-sm transition hover:bg-rose/15 focus:outline-none focus:ring-2 focus:ring-wine/30 sm:size-11"
               onClick={onCart}
               type="button"
             >
@@ -67,7 +67,7 @@ export function Header({
             </button>
             <button
               aria-label={userName ? "Открыть профиль" : "Войти"}
-              className="grid size-11 place-items-center rounded-full bg-white text-ink shadow-sm transition hover:bg-rose/15 focus:outline-none focus:ring-2 focus:ring-wine/30"
+              className="grid size-10 place-items-center rounded-full bg-white text-ink shadow-sm transition hover:bg-rose/15 focus:outline-none focus:ring-2 focus:ring-wine/30 sm:size-11"
               onClick={onProfile}
               title={userName || "Вход"}
               type="button"

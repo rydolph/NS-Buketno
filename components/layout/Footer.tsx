@@ -21,8 +21,8 @@ const serviceLinks: FooterLink[] = [
 
 export function Footer() {
   return (
-    <footer className="mt-8 border-t border-wine/10 bg-white/65">
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 md:grid-cols-[1.2fr_0.8fr_0.8fr_1fr] lg:px-8">
+    <footer className="mt-6 border-t border-wine/10 bg-white/65 sm:mt-8">
+      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:gap-8 sm:px-6 sm:py-8 md:grid-cols-[1.2fr_0.8fr_0.8fr_1fr] lg:px-8">
         <div>
           <p className="font-serif text-3xl leading-none text-wine">НС Букетно</p>
           <p className="mt-3 max-w-sm text-sm leading-6 text-ink/62">

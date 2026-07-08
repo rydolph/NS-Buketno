@@ -1,6 +1,7 @@
 "use client";
 
-import { Heart, ShoppingBag } from "lucide-react";
+import { SlidersHorizontal, Heart, ShoppingBag } from "lucide-react";
+import { useState } from "react";
 import { categories, flowerTypes, formatPrice, occasions, palettes } from "@/lib/mock-data";
 import { PrimaryButton } from "@/components/ui";
 import type { Bouquet, CatalogFilters } from "@/types/shop";
@@ -16,6 +17,7 @@ type CatalogProps = {
 };
 
 export function Catalog({ bouquets, filters, favoriteIds, onOpen, onAdd, onFavorite, onFilters }: CatalogProps) {
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const hasActiveFilters =
     filters.productType !== "all" ||
     filters.category !== "Все" ||
@@ -44,10 +46,23 @@ export function Catalog({ bouquets, filters, favoriteIds, onOpen, onAdd, onFavor
   };
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8" id="catalog">
-      <div className="grid gap-5 lg:grid-cols-[282px_1fr] lg:items-start">
-        <aside className="rounded-[8px] bg-white p-4 shadow-soft lg:sticky lg:top-24">
-          <div className="grid gap-4">
+    <main className="mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8" id="catalog">
+      <div className="grid gap-4 lg:grid-cols-[282px_1fr] lg:items-start">
+        <aside className="rounded-[8px] bg-white p-3 shadow-soft sm:p-4 lg:sticky lg:top-24">
+          <button
+            aria-expanded={mobileFiltersOpen}
+            className="flex w-full items-center justify-between gap-3 rounded-[8px] bg-milk px-3 py-2 text-sm font-semibold text-ink lg:hidden"
+            onClick={() => setMobileFiltersOpen((value) => !value)}
+            type="button"
+          >
+            <span className="inline-flex items-center gap-2">
+              <SlidersHorizontal size={16} />
+              Фильтры
+            </span>
+            <span className="text-xs text-wine">{mobileFiltersOpen ? "Скрыть" : "Показать"}</span>
+          </button>
+
+          <div className={`${mobileFiltersOpen ? "mt-3 grid" : "hidden"} gap-4 lg:grid`}>
             <FilterGroup title="Тип товара">
               <Segment
                 active={filters.productType === "all"}
@@ -116,7 +131,7 @@ export function Catalog({ bouquets, filters, favoriteIds, onOpen, onAdd, onFavor
           </div>
         </aside>
 
-        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" aria-label="Каталог цветов и букетов">
+        <section className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4" aria-label="Каталог цветов и букетов">
           {bouquets.map((bouquet, index) => {
             const favorite = favoriteIds.includes(bouquet.id);
 
@@ -142,7 +157,7 @@ export function Catalog({ bouquets, filters, favoriteIds, onOpen, onAdd, onFavor
                 />
                 <button
                   aria-label={favorite ? "Убрать из избранного" : "Добавить в избранное"}
-                  className={`absolute right-3 top-3 grid size-9 place-items-center rounded-full bg-cream/90 transition hover:bg-white ${favorite ? "text-wine" : "text-ink/55"}`}
+                  className={`absolute right-2 top-2 grid size-8 place-items-center rounded-full bg-cream/90 transition hover:bg-white sm:right-3 sm:top-3 sm:size-9 ${favorite ? "text-wine" : "text-ink/55"}`}
                   onClick={() => onFavorite(bouquet)}
                   type="button"
                 >
@@ -150,13 +165,13 @@ export function Catalog({ bouquets, filters, favoriteIds, onOpen, onAdd, onFavor
                 </button>
               </div>
 
-              <div className="grid gap-3 p-4">
-                <h3 className="truncate whitespace-nowrap font-serif text-[1.34rem] leading-tight text-ink" title={bouquet.title}>{bouquet.title}</h3>
-                <div className="flex items-center justify-between gap-3">
-                  <strong className="whitespace-nowrap text-sm text-wine">{formatPrice(bouquet.price)}</strong>
+              <div className="grid gap-2 p-2.5 sm:gap-3 sm:p-4">
+                <h3 className="truncate whitespace-nowrap font-serif text-[1.05rem] leading-tight text-ink sm:text-[1.34rem]" title={bouquet.title}>{bouquet.title}</h3>
+                <div className="flex items-center justify-between gap-2">
+                  <strong className="whitespace-nowrap text-[12px] text-wine sm:text-sm">{formatPrice(bouquet.price)}</strong>
                   <PrimaryButton onClick={() => onAdd(bouquet)}>
-                  <ShoppingBag size={16} />
-                  <span>Купить</span>
+                  <ShoppingBag size={15} />
+                  <span className="hidden min-[430px]:inline">Купить</span>
                   </PrimaryButton>
                 </div>
               </div>
