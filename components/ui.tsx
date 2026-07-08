@@ -1,0 +1,194 @@
+"use client";
+
+import { AnimatePresence, motion } from "framer-motion";
+import { X } from "lucide-react";
+import { useEffect } from "react";
+
+type ModalProps = {
+  open: boolean;
+  title: string;
+  onClose: () => void;
+  children: React.ReactNode;
+  wide?: boolean;
+};
+
+export function Modal({ open, title, onClose, children, wide }: ModalProps) {
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose, open]);
+
+  return (
+    <AnimatePresence>
+      {open ? (
+        <motion.div
+          aria-modal="true"
+          className="fixed inset-0 z-50 grid place-items-center bg-ink/45 p-3 sm:p-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
+          role="dialog"
+          onMouseDown={onClose}
+        >
+          <motion.div
+            className={`max-h-[92vh] w-full overflow-hidden rounded-[8px] bg-cream shadow-soft outline-none will-change-transform ${
+              wide ? "max-w-6xl" : "max-w-xl"
+            }`}
+            initial={{ y: 24, opacity: 0, scale: 0.98 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            exit={{ y: 18, opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            onMouseDown={(event) => event.stopPropagation()}
+            tabIndex={-1}
+          >
+            <div className="flex items-center justify-between border-b border-wine/10 px-5 py-4 sm:px-6">
+              <h2 className="font-serif text-2xl text-ink">{title}</h2>
+              <button
+                aria-label="Закрыть"
+                className="grid size-10 place-items-center rounded-full text-ink transition hover:bg-rose/15 focus:outline-none focus:ring-2 focus:ring-wine/30"
+                onClick={onClose}
+                type="button"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="max-h-[calc(92vh-73px)] overflow-y-auto">{children}</div>
+          </motion.div>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
+  );
+}
+
+export function PillButton({
+  children,
+  active,
+  onClick,
+  ariaLabel
+}: {
+  children: React.ReactNode;
+  active?: boolean;
+  onClick: () => void;
+  ariaLabel?: string;
+}) {
+  return (
+    <button
+      aria-label={ariaLabel}
+      className={`rounded-full px-4 py-2 text-sm transition focus:outline-none focus:ring-2 focus:ring-wine/30 ${
+        active ? "bg-wine text-white shadow-petal" : "bg-white/70 text-ink hover:bg-rose/15"
+      }`}
+      onClick={onClick}
+      type="button"
+    >
+      {children}
+    </button>
+  );
+}
+
+export function PrimaryButton({
+  children,
+  onClick,
+  type = "button",
+  disabled
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  type?: "button" | "submit";
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      className="inline-flex min-h-10 items-center justify-center gap-2 rounded-full bg-wine px-4 py-2 text-[13px] font-semibold leading-tight text-white shadow-petal transition hover:bg-[#69233a] focus:outline-none focus:ring-2 focus:ring-wine/35 disabled:cursor-not-allowed disabled:opacity-55 sm:min-h-11 sm:px-5 sm:text-sm"
+      disabled={disabled}
+      onClick={onClick}
+      type={type}
+    >
+      {children}
+    </button>
+  );
+}
+
+export function SecondaryButton({
+  children,
+  onClick,
+  type = "button"
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  type?: "button" | "submit";
+}) {
+  return (
+    <button
+      className="inline-flex min-h-10 items-center justify-center gap-2 rounded-full border border-wine/15 bg-white/70 px-4 py-2 text-[13px] font-semibold leading-tight text-ink transition hover:bg-rose/15 focus:outline-none focus:ring-2 focus:ring-wine/30 sm:min-h-11 sm:px-5 sm:text-sm"
+      onClick={onClick}
+      type={type}
+    >
+      {children}
+    </button>
+  );
+}
+
+export function Field({
+  label,
+  value,
+  onChange,
+  type = "text",
+  placeholder,
+  required
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  type?: string;
+  placeholder?: string;
+  required?: boolean;
+}) {
+  return (
+    <label className="grid gap-2 text-sm font-medium text-ink">
+      {label}
+      <input
+        className="h-12 rounded-[8px] border border-wine/10 bg-white/75 px-4 text-sm outline-none transition focus:border-wine/35 focus:ring-4 focus:ring-rose/15"
+        onChange={(event) => onChange(event.target.value)}
+        placeholder={placeholder}
+        required={required}
+        type={type}
+        value={value}
+      />
+    </label>
+  );
+}
+
+export function Textarea({
+  label,
+  value,
+  onChange,
+  placeholder
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+}) {
+  return (
+    <label className="grid gap-2 text-sm font-medium text-ink">
+      {label}
+      <textarea
+        className="min-h-24 rounded-[8px] border border-wine/10 bg-white/75 px-4 py-3 text-sm outline-none transition focus:border-wine/35 focus:ring-4 focus:ring-rose/15"
+        onChange={(event) => onChange(event.target.value)}
+        placeholder={placeholder}
+        value={value}
+      />
+    </label>
+  );
+}
