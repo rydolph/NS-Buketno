@@ -1,26 +1,30 @@
 "use client";
 
-import { Heart, ShoppingBag, Sparkles, UserRound } from "lucide-react";
+import { Heart, ShoppingBag, Sparkles, Store, UserRound } from "lucide-react";
 import { PrimaryButton } from "@/components/ui";
 
 type HeaderProps = {
   cartCount: number;
   favoriteCount: number;
+  isSeller: boolean;
   userName?: string;
   onBuilder: () => void;
   onCart: () => void;
   onFavorites: () => void;
   onProfile: () => void;
+  onSeller: () => void;
 };
 
 export function Header({
   cartCount,
   favoriteCount,
+  isSeller,
   userName,
   onBuilder,
   onCart,
   onFavorites,
-  onProfile
+  onProfile,
+  onSeller
 }: HeaderProps) {
   return (
     <header className="sticky top-0 z-30 border-b border-wine/10 bg-milk/90 backdrop-blur-xl">
@@ -39,6 +43,17 @@ export function Header({
               <span className="hidden sm:inline">Собрать букет</span>
               </PrimaryButton>
             </span>
+            {isSeller ? (
+              <button
+                aria-label="Открыть кабинет продавца"
+                className="grid size-10 place-items-center rounded-full bg-white text-ink shadow-sm transition hover:bg-rose/15 focus:outline-none focus:ring-2 focus:ring-wine/30 sm:size-11"
+                onClick={onSeller}
+                title="Кабинет продавца"
+                type="button"
+              >
+                <Store size={20} />
+              </button>
+            ) : null}
             <button
               aria-label={`Открыть избранное, товаров: ${favoriteCount}`}
               className="relative grid size-10 place-items-center rounded-full bg-white text-ink shadow-sm transition hover:bg-rose/15 focus:outline-none focus:ring-2 focus:ring-wine/30 sm:size-11"

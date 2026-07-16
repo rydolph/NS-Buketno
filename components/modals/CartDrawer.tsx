@@ -4,12 +4,15 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, Trash2, X } from "lucide-react";
 import { formatPrice } from "@/lib/mock-data";
 import { Field } from "@/components/ui";
-import type { CartItem } from "@/types/shop";
+import type { Bouquet, CartItem, PromoCode } from "@/types/shop";
 import { useEffect, useState } from "react";
 
 type CartDrawerProps = {
   open: boolean;
   cart: CartItem[];
+  products: Bouquet[];
+  getAvailableQuantity: (productId: string) => number;
+  promoCodes: PromoCode[];
   total: number;
   onClose: () => void;
   onCheckout: () => void;
@@ -18,9 +21,24 @@ type CartDrawerProps = {
   onRemove: (id: string) => void;
 };
 
-export function CartDrawer({ open, cart, total, onClose, onCheckout, onEdit, onQuantity, onRemove }: CartDrawerProps) {
+export function CartDrawer({ open, cart, products, getAvailableQuantity, promoCodes, total, onClose, onCheckout, onEdit, onQuantity, onRemove }: CartDrawerProps) {
   const [promo, setPromo] = useState("");
-  const discount = promo.trim().toUpperCase() === "BUKET10" ? Math.round(total * 0.1) : 0;
+  const productById = new Map(products.map((product) => [product.id, product]));
+  const stockIssues = cart.filter((item) => {
+    return item.bouquetId ? getAvailableQuantity(item.bouquetId) < item.quantity : false;
+  });
+  const canCheckout = cart.length > 0 && stockIssues.length === 0;
+  const normalizedPromo = promo.trim().toUpperCase();
+  const today = new Date().toISOString().slice(0, 10);
+  const activePromo = promoCodes.find(
+    (item) =>
+      item.code === normalizedPromo &&
+      item.active &&
+      item.expiresAt >= today &&
+      item.used < item.usageLimit
+  );
+  const discount = activePromo ? Math.round(total * (activePromo.discount / 100)) : 0;
+  const suggestedPromo = promoCodes.find((item) => item.active && item.expiresAt >= today);
 
   useEffect(() => {
     if (!open) {
@@ -71,7 +89,12 @@ export function CartDrawer({ open, cart, total, onClose, onCheckout, onEdit, onQ
             <div className="min-h-0 flex-1 overflow-y-auto p-3 sm:p-5">
               {cart.length ? (
                 <div className="grid gap-4">
-                  {cart.map((item) => (
+                  {cart.map((item) => {
+                    const product = item.bouquetId ? productById.get(item.bouquetId) : null;
+                    const stock = item.bouquetId ? getAvailableQuantity(item.bouquetId) : product?.stock || 0;
+                    const hasStockIssue = Boolean(item.bouquetId && stock < item.quantity);
+
+                    return (
                     <article
                       className="grid cursor-pointer grid-cols-[72px_1fr] gap-3 rounded-[8px] bg-white p-3 transition hover:bg-rose/10 focus-within:ring-2 focus-within:ring-wine/20 sm:grid-cols-[84px_1fr]"
                       key={item.id}
@@ -105,18 +128,24 @@ export function CartDrawer({ open, cart, total, onClose, onCheckout, onEdit, onQ
                           </button>
                         </div>
                         <p className="line-clamp-2 text-xs leading-5 text-ink/55">{item.meta.join(" · ")}</p>
+                        {hasStockIssue ? (
+                          <p className="rounded-[8px] bg-rose/15 px-3 py-2 text-xs font-semibold text-wine">
+                            Сейчас доступно {stock} шт. Уменьшите количество или удалите товар.
+                          </p>
+                        ) : null}
                         <div className="flex w-fit items-center rounded-full bg-milk p-1">
                           <button aria-label="Уменьшить" className="grid size-8 place-items-center rounded-full bg-white" onClick={(event) => { event.stopPropagation(); onQuantity(item.id, -1); }} type="button">
                             <Minus size={14} />
                           </button>
                           <span className="w-9 text-center text-sm">{item.quantity}</span>
-                          <button aria-label="Увеличить" className="grid size-8 place-items-center rounded-full bg-wine text-white" onClick={(event) => { event.stopPropagation(); onQuantity(item.id, 1); }} type="button">
+                          <button aria-label="Увеличить" className="grid size-8 place-items-center rounded-full bg-wine text-white disabled:cursor-not-allowed disabled:opacity-50" disabled={Boolean(item.bouquetId && item.quantity >= stock)} onClick={(event) => { event.stopPropagation(); onQuantity(item.id, 1); }} type="button">
                             <Plus size={14} />
                           </button>
                         </div>
                       </div>
                     </article>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="grid h-full place-items-center rounded-[8px] bg-white p-8 text-center">
@@ -129,8 +158,13 @@ export function CartDrawer({ open, cart, total, onClose, onCheckout, onEdit, onQ
             </div>
 
             <div className="shrink-0 grid gap-3 border-t border-wine/10 bg-cream p-4 sm:gap-4 sm:p-5">
-              <Field label="Промокод" onChange={setPromo} placeholder="Попробуйте BUKET10" value={promo} />
+              <Field label="Промокод" onChange={setPromo} placeholder={suggestedPromo ? `Попробуйте ${suggestedPromo.code}` : "Промокод"} value={promo} />
               <div className="grid gap-2 text-sm">
+                {stockIssues.length ? (
+                  <p className="rounded-[8px] bg-rose/15 p-3 text-sm font-semibold text-wine">
+                    В корзине есть товары, которых уже нет в нужном количестве. Оформление временно недоступно.
+                  </p>
+                ) : null}
                 <div className="flex justify-between text-ink/65">
                   <span>Товары</span>
                   <span>{formatPrice(total)}</span>
@@ -146,7 +180,7 @@ export function CartDrawer({ open, cart, total, onClose, onCheckout, onEdit, onQ
               </div>
               <button
                 className="h-12 w-full rounded-[8px] bg-wine px-4 text-sm font-semibold text-white shadow-petal transition hover:bg-[#69233a] focus:outline-none focus:ring-2 focus:ring-wine/35 disabled:cursor-not-allowed disabled:opacity-55"
-                disabled={!cart.length}
+                disabled={!canCheckout}
                 onClick={onCheckout}
                 type="button"
               >

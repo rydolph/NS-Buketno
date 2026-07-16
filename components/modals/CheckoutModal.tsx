@@ -25,6 +25,13 @@ export function CheckoutModal({ open, user, total, onClose, onPay }: CheckoutMod
   const [success, setSuccess] = useState<Order | null>(null);
 
   useEffect(() => {
+    if (!open) {
+      setSuccess(null);
+      setDelivery("");
+      setComment("");
+      return;
+    }
+
     if (open && user && !success) {
       setName(user.name);
       setPhone(user.phone);

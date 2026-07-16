@@ -1,12 +1,13 @@
 "use client";
 
 import { Heart, ShoppingBag } from "lucide-react";
-import { bouquets, formatPrice } from "@/lib/mock-data";
+import { formatPrice } from "@/lib/mock-data";
 import { Modal, PrimaryButton } from "@/components/ui";
 import type { Bouquet } from "@/types/shop";
 
 type FavoritesModalProps = {
   open: boolean;
+  products: Bouquet[];
   favoriteIds: string[];
   onClose: () => void;
   onAdd: (bouquet: Bouquet) => void;
@@ -14,8 +15,8 @@ type FavoritesModalProps = {
   onToggle: (bouquet: Bouquet) => void;
 };
 
-export function FavoritesModal({ open, favoriteIds, onClose, onAdd, onOpen, onToggle }: FavoritesModalProps) {
-  const items = bouquets.filter((bouquet) => favoriteIds.includes(bouquet.id));
+export function FavoritesModal({ open, products, favoriteIds, onClose, onAdd, onOpen, onToggle }: FavoritesModalProps) {
+  const items = products.filter((bouquet) => favoriteIds.includes(bouquet.id));
 
   return (
     <Modal open={open} title="Избранное" onClose={onClose} wide>

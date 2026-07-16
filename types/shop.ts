@@ -13,12 +13,36 @@ export type Bouquet = {
   palette: string;
   description: string;
   composition: string[];
+  ingredients?: Array<{ productId: string; quantity: number }>;
   price: number;
+  stock?: number;
   image: string;
   stemOptions?: number[];
   packages: Array<{ label: string; price: number }>;
   reviews: Review[];
   tags: string[];
+};
+
+export type InventoryDelivery = {
+  id: string;
+  productId: string;
+  quantity: number;
+  unitCost: number;
+  totalCost: number;
+  priceInputMode: "unit" | "total";
+  date: string;
+  note: string;
+};
+
+export type PromoCode = {
+  id: string;
+  code: string;
+  discount: number;
+  expiresAt: string;
+  usageLimit: number;
+  used: number;
+  active: boolean;
+  description: string;
 };
 
 export type FlowerStem = {
@@ -66,19 +90,38 @@ export type User = {
   name: string;
   email: string;
   phone: string;
+  role: "customer" | "seller";
   addresses: string[];
   favorites: string[];
   reviews: Review[];
   orders: Order[];
 };
 
+export type ChatMessage = {
+  id: string;
+  orderId: string;
+  authorRole: "customer" | "seller";
+  authorName: string;
+  text: string;
+  image?: string;
+  date: string;
+};
+
+export type ChatThread = {
+  id: string;
+  orderId: string;
+  messages: ChatMessage[];
+};
+
 export type Order = {
   id: string;
+  customerEmail?: string;
   date: string;
   status: "Завершен" | "В доставке" | "Ожидает оплаты";
   items: CartItem[];
   total: number;
   deliveryAddress: string;
+  chat: ChatThread;
 };
 
 export type CookieSettings = {

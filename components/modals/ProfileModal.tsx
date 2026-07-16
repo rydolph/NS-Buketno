@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { LogOut, Repeat2, Star } from "lucide-react";
+import { LogOut, MessageCircle, Repeat2, Star } from "lucide-react";
 import { useState } from "react";
 import { bouquets, formatPrice } from "@/lib/mock-data";
 import { Field, Modal, PrimaryButton, SecondaryButton, Textarea } from "@/components/ui";
@@ -14,12 +14,13 @@ type ProfileModalProps = {
   onUpdate: (patch: Partial<User>) => void;
   onLogout: () => void;
   onRepeat: (order: Order) => void;
+  onChat: (order: Order) => void;
   onReview: (productId: string, rating: number, text: string) => void;
 };
 
 const tabs = ["Личные данные", "Адреса", "История заказов", "Отзывы", "Настройки"];
 
-export function ProfileModal({ open, user, onClose, onUpdate, onLogout, onRepeat, onReview }: ProfileModalProps) {
+export function ProfileModal({ open, user, onClose, onUpdate, onLogout, onRepeat, onChat, onReview }: ProfileModalProps) {
   const [tab, setTab] = useState(tabs[0]);
 
   if (!user) {
@@ -64,7 +65,7 @@ export function ProfileModal({ open, user, onClose, onUpdate, onLogout, onRepeat
           >
             {tab === "Личные данные" ? <Personal user={user} onUpdate={onUpdate} /> : null}
             {tab === "Адреса" ? <Addresses user={user} onUpdate={onUpdate} /> : null}
-            {tab === "История заказов" ? <Orders orders={user.orders} onRepeat={onRepeat} /> : null}
+            {tab === "История заказов" ? <Orders orders={user.orders} onRepeat={onRepeat} onChat={onChat} /> : null}
             {tab === "Отзывы" ? (
               <Reviews user={user} onReview={onReview} />
             ) : null}
@@ -124,7 +125,7 @@ function Addresses({ user, onUpdate }: { user: User; onUpdate: (patch: Partial<U
   );
 }
 
-function Orders({ orders, onRepeat }: { orders: Order[]; onRepeat: (order: Order) => void }) {
+function Orders({ orders, onRepeat, onChat }: { orders: Order[]; onRepeat: (order: Order) => void; onChat: (order: Order) => void }) {
   return (
     <div className="grid gap-4">
       <h3 className="font-serif text-3xl text-ink">История заказов</h3>
@@ -141,10 +142,16 @@ function Orders({ orders, onRepeat }: { orders: Order[]; onRepeat: (order: Order
               <strong className="text-wine">{formatPrice(order.total)}</strong>
             </div>
             <p className="mt-3 text-sm text-ink/65">{order.items.map((item) => `${item.title} x${item.quantity}`).join(", ")}</p>
-            <SecondaryButton onClick={() => onRepeat(order)}>
-              <Repeat2 size={16} />
-              Повторить заказ
-            </SecondaryButton>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <SecondaryButton onClick={() => onChat(order)}>
+                <MessageCircle size={16} />
+                Чат
+              </SecondaryButton>
+              <SecondaryButton onClick={() => onRepeat(order)}>
+                <Repeat2 size={16} />
+                Повторить заказ
+              </SecondaryButton>
+            </div>
           </article>
         ))
       ) : (

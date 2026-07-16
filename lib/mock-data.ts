@@ -233,6 +233,21 @@ export const testOrders: Order[] = [
         meta: ["Размер M", "Шелковая бумага"]
       }
     ]
+    ,
+    chat: {
+      id: "chat-LF-2406",
+      orderId: "LF-2406",
+      messages: [
+        {
+          id: "msg-LF-2406-1",
+          orderId: "LF-2406",
+          authorRole: "seller",
+          authorName: "Флорист",
+          text: "Здравствуйте! Чат по заказу открыт, сюда можно прислать уточнения или фото.",
+          date: "2026-06-14"
+        }
+      ]
+    }
   }
 ];
 
@@ -241,6 +256,7 @@ export const testUser: User = {
   name: "Александра",
   email: "demo@ns-buketno.ru",
   phone: "+7 900 555-44-33",
+  role: "seller",
   addresses: ["Москва, Патриаршие пруды, 12", "Москва, Остоженка, 7"],
   favorites: ["bq-rose-premium", "bq-orchid-atelier"],
   reviews: [],

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { MessageCircle } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Catalog } from "@/components/Catalog";
@@ -9,13 +10,14 @@ import { CookieBanner } from "@/components/CookieBanner";
 import { AuthModal } from "@/components/modals/AuthModal";
 import { BuilderModal } from "@/components/modals/BuilderModal";
 import { CartDrawer } from "@/components/modals/CartDrawer";
+import { ChatModal, ChatPickerModal } from "@/components/modals/ChatModal";
 import { CheckoutModal } from "@/components/modals/CheckoutModal";
 import { FavoritesModal } from "@/components/modals/FavoritesModal";
 import { ProductModal } from "@/components/modals/ProductModal";
 import { ProfileModal } from "@/components/modals/ProfileModal";
-import { bouquets } from "@/lib/mock-data";
+import { SellerModal } from "@/components/modals/SellerModal";
 import { useShop } from "@/lib/use-shop";
-import type { Bouquet, CartItem, CatalogFilters } from "@/types/shop";
+import type { Bouquet, CartItem, CatalogFilters, Order } from "@/types/shop";
 
 type PendingAction = (() => void) | null;
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
@@ -40,12 +42,17 @@ export function FlowerStoreApp() {
   const [favoritesOpen, setFavoritesOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [sellerOpen, setSellerOpen] = useState(false);
+  const [chatOrderId, setChatOrderId] = useState<string | null>(null);
+  const [chatRole, setChatRole] = useState<"customer" | "seller">("customer");
+  const [chatPickerOpen, setChatPickerOpen] = useState(false);
   const [editingCartItem, setEditingCartItem] = useState<CartItem | null>(null);
   const [cartPulse, setCartPulse] = useState(0);
   const pendingAction = useRef<PendingAction>(null);
 
   const filteredBouquets = useMemo(() => {
-    return bouquets.filter((bouquet) => {
+    return shop.bouquets.filter((bouquet) => {
+      if (shop.getAvailableQuantity(bouquet.id) <= 0) return false;
       if (filters.productType !== "all" && bouquet.type !== filters.productType) return false;
       if (filters.category !== "Все" && bouquet.category !== filters.category) return false;
       if (filters.flowerType !== "Все" && bouquet.flowerType !== filters.flowerType) return false;
@@ -54,7 +61,19 @@ export function FlowerStoreApp() {
       if (bouquet.price < filters.minPrice || bouquet.price > filters.maxPrice) return false;
       return true;
     });
-  }, [filters]);
+  }, [filters, shop.bouquets, shop.getAvailableQuantity]);
+
+  const chatOrder = useMemo(() => {
+    if (!chatOrderId) {
+      return null;
+    }
+
+    const orders = chatRole === "seller" ? shop.sellerOrders : shop.user?.orders || [];
+    return orders.find((order) => order.id === chatOrderId) || null;
+  }, [chatOrderId, chatRole, shop.sellerOrders, shop.user?.orders]);
+  const chatOrders = shop.user?.role === "seller"
+    ? shop.sellerOrders
+    : shop.user?.orders || [];
 
   useEffect(() => {
     if (!cartPulse) return;
@@ -96,6 +115,10 @@ export function FlowerStoreApp() {
   };
 
   const addItem = (item: CartItem) => {
+    if (item.bouquetId && shop.getAvailableQuantity(item.bouquetId) < item.quantity) {
+      return;
+    }
+
     shop.addToCart(item);
     setCartPulse((value) => value + 1);
   };
@@ -131,7 +154,7 @@ export function FlowerStoreApp() {
       return;
     }
 
-    const bouquet = bouquets.find((entry) => entry.id === item.bouquetId);
+    const bouquet = shop.bouquets.find((entry) => entry.id === item.bouquetId);
     if (!bouquet) {
       return;
     }
@@ -142,15 +165,26 @@ export function FlowerStoreApp() {
     window.history.pushState({}, "", `${basePath}/catalog/bouquet/${bouquet.slug}`);
   };
 
+  const openChat = (order: Order, role: "customer" | "seller") => {
+    setChatOrderId(order.id);
+    setChatRole(role);
+  };
+
   return (
     <div className="min-h-screen bg-milk text-ink">
       <Header
         cartCount={shop.cartCount}
         favoriteCount={shop.user?.favorites.length || 0}
+        isSeller={shop.user?.role === "seller"}
         onBuilder={() => requireAuth(() => setBuilderOpen(true))}
         onCart={() => setCartOpen(true)}
         onFavorites={() => requireAuth(() => setFavoritesOpen(true))}
         onProfile={() => requireAuth(() => setProfileOpen(true))}
+        onSeller={() => requireAuth(() => {
+          if (shop.user?.role === "seller") {
+            setSellerOpen(true);
+          }
+        })}
         userName={shop.user?.name}
       />
 
@@ -168,6 +202,17 @@ export function FlowerStoreApp() {
           </motion.div>
         ) : null}
       </AnimatePresence>
+
+      {chatOrders.length ? (
+        <button
+          aria-label="Открыть чат по последнему заказу"
+          className="fixed bottom-5 right-5 z-30 grid size-14 place-items-center rounded-full bg-wine text-white shadow-petal transition hover:bg-[#69233a] focus:outline-none focus:ring-2 focus:ring-wine/35"
+          onClick={() => setChatPickerOpen(true)}
+          type="button"
+        >
+          <MessageCircle size={24} />
+        </button>
+      ) : null}
 
       <Catalog
         bouquets={filteredBouquets}
@@ -192,8 +237,9 @@ export function FlowerStoreApp() {
       />
 
       <ProductModal
-        bouquet={selectedBouquet}
+        bouquet={selectedBouquet ? shop.bouquets.find((bouquet) => bouquet.id === selectedBouquet.id) || selectedBouquet : null}
         editingItem={editingCartItem}
+        availableQuantity={selectedBouquet ? shop.getAvailableQuantity(selectedBouquet.id) : 0}
         onAdd={(item) => {
           if (editingCartItem) {
             shop.updateCartItem(editingCartItem.id, item);
@@ -233,6 +279,9 @@ export function FlowerStoreApp() {
         onQuantity={shop.changeQuantity}
         onRemove={shop.removeFromCart}
         open={cartOpen}
+        promoCodes={shop.promoCodes}
+        products={shop.bouquets}
+        getAvailableQuantity={shop.getAvailableQuantity}
         total={shop.cartTotal}
       />
 
@@ -250,6 +299,7 @@ export function FlowerStoreApp() {
         }}
         onToggle={toggleFavorite}
         open={favoritesOpen}
+        products={shop.bouquets}
       />
 
       <CheckoutModal
@@ -263,6 +313,7 @@ export function FlowerStoreApp() {
       <ProfileModal
         onClose={() => setProfileOpen(false)}
         onLogout={shop.logout}
+        onChat={(order) => openChat(order, "customer")}
         onRepeat={(order) => {
           shop.repeatOrder(order);
           setProfileOpen(false);
@@ -272,6 +323,40 @@ export function FlowerStoreApp() {
         onUpdate={shop.updateUser}
         open={profileOpen}
         user={shop.user}
+      />
+
+      <SellerModal
+        deliveries={shop.deliveries}
+        orders={shop.sellerOrders}
+        onAddProduct={shop.addProduct}
+        onChat={(order) => openChat(order, "seller")}
+        onClose={() => setSellerOpen(false)}
+        onCreatePromoCode={shop.createPromoCode}
+        onReceiveDelivery={shop.receiveDelivery}
+        onTogglePromoCode={shop.togglePromoCode}
+        onUpdateProduct={shop.updateProduct}
+        open={sellerOpen}
+        products={shop.bouquets}
+        promoCodes={shop.promoCodes}
+      />
+
+      <ChatModal
+        onClose={() => setChatOrderId(null)}
+        onSend={shop.sendChatMessage}
+        open={Boolean(chatOrder)}
+        order={chatOrder}
+        role={chatRole}
+      />
+
+      <ChatPickerModal
+        onClose={() => setChatPickerOpen(false)}
+        onSelect={(order, role) => {
+          setChatPickerOpen(false);
+          openChat(order, role);
+        }}
+        open={chatPickerOpen}
+        orders={chatOrders}
+        role={shop.user?.role === "seller" ? "seller" : "customer"}
       />
 
       <CookieBanner onSave={shop.setCookies} settings={shop.cookies} />

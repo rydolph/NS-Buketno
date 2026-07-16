@@ -9,6 +9,7 @@ import type { Bouquet, CartItem, Review } from "@/types/shop";
 type ProductModalProps = {
   bouquet: Bouquet | null;
   editingItem?: CartItem | null;
+  availableQuantity: number;
   userReviews: Review[];
   onClose: () => void;
   onAdd: (item: CartItem) => void;
@@ -18,6 +19,7 @@ type ProductModalProps = {
 export function ProductModal({
   bouquet,
   editingItem,
+  availableQuantity,
   userReviews,
   onClose,
   onAdd,
@@ -77,6 +79,7 @@ export function ProductModal({
   };
 
   const reviews = [...bouquet.reviews, ...userReviews.filter((review) => review.bouquetId === bouquet.id)];
+  const available = availableQuantity > 0;
 
   return (
     <Modal open={Boolean(bouquet)} title={bouquet.title} onClose={onClose} wide>
@@ -95,6 +98,11 @@ export function ProductModal({
               <strong className="text-2xl text-wine">{formatPrice(price)}</strong>
             </div>
             <p className="mt-3 leading-7 text-ink/68">{bouquet.description}</p>
+            {!available ? (
+              <p className="mt-3 rounded-[8px] bg-rose/15 p-3 text-sm font-semibold text-wine">
+                Товар закончился. Купить или добавить в корзину сейчас нельзя.
+              </p>
+            ) : null}
           </div>
 
           <div className="rounded-[8px] bg-milk p-4">
@@ -144,11 +152,11 @@ export function ProductModal({
           </div>
 
           <div className="grid gap-2 sm:flex-row md:flex">
-            <PrimaryButton onClick={() => onAdd(item)}>
+            <PrimaryButton onClick={() => onAdd(item)} disabled={!available}>
               <ShoppingBag size={17} />
               {editingItem ? "Сохранить изменения" : "Добавить в корзину"}
             </PrimaryButton>
-            <SecondaryButton onClick={() => onBuy(item)}>
+            <SecondaryButton onClick={() => onBuy(item)} disabled={!available}>
               <CalendarDays size={17} />
               Купить сейчас
             </SecondaryButton>

@@ -122,15 +122,18 @@ export function PrimaryButton({
 export function SecondaryButton({
   children,
   onClick,
-  type = "button"
+  type = "button",
+  disabled
 }: {
   children: React.ReactNode;
   onClick?: () => void;
   type?: "button" | "submit";
+  disabled?: boolean;
 }) {
   return (
     <button
-      className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full border border-wine/15 bg-white/70 px-3 py-2 text-[12px] font-semibold leading-tight text-ink transition hover:bg-rose/15 focus:outline-none focus:ring-2 focus:ring-wine/30 sm:min-h-11 sm:gap-2 sm:px-5 sm:text-sm"
+      className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full border border-wine/15 bg-white/70 px-3 py-2 text-[12px] font-semibold leading-tight text-ink transition hover:bg-rose/15 focus:outline-none focus:ring-2 focus:ring-wine/30 disabled:cursor-not-allowed disabled:opacity-55 sm:min-h-11 sm:gap-2 sm:px-5 sm:text-sm"
+      disabled={disabled}
       onClick={onClick}
       type={type}
     >
