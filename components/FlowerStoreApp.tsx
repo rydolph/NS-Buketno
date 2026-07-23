@@ -133,7 +133,11 @@ export function FlowerStoreApp() {
         price: bouquet.price,
         quantity: 1,
         meta: [
-          bouquet.type === "bouquet" ? "Готовый букет" : `${bouquet.stemOptions?.[0] || 1} стеблей`,
+          bouquet.type === "flowers"
+            ? `${bouquet.stemOptions?.[0] || 1} стеблей`
+            : bouquet.type === "composition"
+              ? "Композиция"
+              : "Готовый букет",
           bouquet.packages[0].label
         ]
       });
@@ -206,7 +210,7 @@ export function FlowerStoreApp() {
       {chatOrders.length ? (
         <button
           aria-label="Открыть чат по последнему заказу"
-          className="fixed bottom-5 right-5 z-30 grid size-14 place-items-center rounded-full bg-wine text-white shadow-petal transition hover:bg-[#69233a] focus:outline-none focus:ring-2 focus:ring-wine/35"
+          className="fixed bottom-5 right-5 z-30 grid size-14 place-items-center rounded-full bg-wine text-white shadow-petal transition hover:bg-[#844b5f] focus:outline-none focus:ring-2 focus:ring-wine/35"
           onClick={() => setChatPickerOpen(true)}
           type="button"
         >

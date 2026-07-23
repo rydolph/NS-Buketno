@@ -161,8 +161,8 @@ export function SellerModal({
   const openChats = orders.filter((order) => order.chat?.messages.length).length;
 
   return (
-    <Modal open={open} title="Личный кабинет продавца" onClose={onClose} wide>
-      <div className="grid gap-4 p-4 lg:grid-cols-[250px_1fr] lg:gap-5 lg:p-6">
+    <Modal fullScreen open={open} title="Личный кабинет продавца" onClose={onClose}>
+      <div className="grid min-h-full gap-4 p-4 lg:grid-cols-[250px_1fr] lg:gap-5 lg:p-6">
         <aside className="scrollbar-none flex gap-2 overflow-x-auto pb-1 lg:grid lg:content-start lg:overflow-visible lg:pb-0">
           {tabs.map((item) => (
             <button
@@ -189,7 +189,7 @@ export function SellerModal({
         <AnimatePresence mode="wait">
           <motion.section
             animate={{ opacity: 1, y: 0 }}
-            className="min-h-[420px] rounded-[8px] bg-milk p-4 sm:p-5"
+            className="min-h-[420px] rounded-[8px] bg-milk p-4 sm:p-5 lg:min-h-full"
             exit={{ opacity: 0, y: 8 }}
             initial={{ opacity: 0, y: 8 }}
             key={tab}

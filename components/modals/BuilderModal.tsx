@@ -12,19 +12,29 @@ type BuilderModalProps = {
   onAdd: (item: CartItem) => void;
 };
 
+const wrapPackages = constructorPackages.filter((item) => item.kind === "wrap");
+
 export function BuilderModal({ open, onClose, onAdd }: BuilderModalProps) {
   const [counts, setCounts] = useState<Record<string, number>>({ "rose-blush": 7, eucalyptus: 3 });
-  const [packaging, setPackaging] = useState(constructorPackages[0].id);
+  const [packaging, setPackaging] = useState(wrapPackages[0]?.id || "");
+  const [selectedPackagingDecorations, setSelectedPackagingDecorations] = useState<string[]>([]);
+  const [packagingColors, setPackagingColors] = useState<Record<string, string>>(() =>
+    Object.fromEntries(constructorPackages.map((item) => [item.id, item.colors[0]?.id || ""]))
+  );
   const [selectedAddons, setSelectedAddons] = useState<string[]>(["card"]);
 
   const total = useMemo(() => {
     const flowersTotal = stems.reduce((sum, stem) => sum + (counts[stem.id] || 0) * stem.price, 0);
-    const packageTotal = constructorPackages.find((item) => item.id === packaging)?.price || 0;
+    const packageTotal = constructorPackages
+      .filter((item) =>
+        item.kind === "wrap" ? item.id === packaging : selectedPackagingDecorations.includes(item.id)
+      )
+      .reduce((sum, item) => sum + item.price, 0);
     const addonsTotal = addons
       .filter((item) => selectedAddons.includes(item.id))
       .reduce((sum, item) => sum + item.price, 0);
     return flowersTotal + packageTotal + addonsTotal;
-  }, [counts, packaging, selectedAddons]);
+  }, [counts, packaging, selectedAddons, selectedPackagingDecorations]);
 
   const flowerCount = Object.values(counts).reduce((sum, value) => sum + value, 0);
 
@@ -32,7 +42,14 @@ export function BuilderModal({ open, onClose, onAdd }: BuilderModalProps) {
     const chosenFlowers = stems
       .filter((stem) => counts[stem.id])
       .map((stem) => `${stem.name} x${counts[stem.id]}`);
-    const chosenPackage = constructorPackages.find((item) => item.id === packaging);
+    const chosenPackages = constructorPackages
+      .filter((item) =>
+        item.kind === "wrap" ? item.id === packaging : selectedPackagingDecorations.includes(item.id)
+      )
+      .map((item) => {
+        const color = item.colors.find((option) => option.id === packagingColors[item.id]);
+        return color ? `${item.name}: ${color.name}` : item.name;
+      });
     const chosenAddons = addons.filter((item) => selectedAddons.includes(item.id)).map((item) => item.name);
 
     onAdd({
@@ -41,7 +58,7 @@ export function BuilderModal({ open, onClose, onAdd }: BuilderModalProps) {
       image: "https://images.unsplash.com/photo-1470509037663-253afd7f0f51?auto=format&fit=crop&w=1200&q=85",
       price: total,
       quantity: 1,
-      meta: [...chosenFlowers, chosenPackage?.name || "", ...chosenAddons].filter(Boolean)
+      meta: [...chosenFlowers, ...chosenPackages, ...chosenAddons]
     });
   };
 
@@ -90,17 +107,68 @@ export function BuilderModal({ open, onClose, onAdd }: BuilderModalProps) {
         <section className="grid content-start gap-5">
           <div className="grid gap-3">
             <h3 className="font-serif text-2xl text-ink">Упаковка</h3>
-            {constructorPackages.map((item) => (
-              <button
-                className={`rounded-[8px] border p-4 text-left transition ${packaging === item.id ? "border-wine bg-wine text-white" : "border-wine/10 bg-white text-ink"}`}
-                key={item.id}
-                onClick={() => setPackaging(item.id)}
-                type="button"
-              >
-                <span className="block font-semibold">{item.name}</span>
-                <span className="text-sm opacity-75">{formatPrice(item.price)}</span>
-              </button>
-            ))}
+            {constructorPackages.map((item) => {
+              const active =
+                item.kind === "wrap"
+                  ? packaging === item.id
+                  : selectedPackagingDecorations.includes(item.id);
+              const selectedColor = item.colors.find((color) => color.id === packagingColors[item.id]);
+
+              return (
+                <article
+                  className={`overflow-hidden rounded-[8px] border transition ${active ? "border-wine bg-wine text-white" : "border-wine/10 bg-white text-ink"}`}
+                  key={item.id}
+                >
+                  <button
+                    aria-pressed={active}
+                    className="w-full p-4 text-left"
+                    onClick={() => {
+                      if (item.kind === "wrap") {
+                        setPackaging(item.id);
+                        return;
+                      }
+
+                      setSelectedPackagingDecorations((current) =>
+                        active ? current.filter((id) => id !== item.id) : [...current, item.id]
+                      );
+                    }}
+                    type="button"
+                  >
+                    <span className="block font-semibold">{item.name}</span>
+                    {item.price > 0 ? <span className="text-sm opacity-75">{formatPrice(item.price)}</span> : null}
+                  </button>
+
+                  {active ? (
+                    <div className="border-t border-white/20 px-4 pb-4 pt-3">
+                      <p className="mb-2 text-xs text-white/75">Цвет: {selectedColor?.name}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {item.colors.map((color) => {
+                          const colorActive = color.id === packagingColors[item.id];
+                          return (
+                            <button
+                              aria-label={`${item.name}, цвет ${color.name}`}
+                              aria-pressed={colorActive}
+                              className={`size-7 rounded-full border-2 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-white ${
+                                colorActive
+                                  ? "border-white ring-2 ring-white/80 ring-offset-2 ring-offset-wine"
+                                  : "border-white/65 hover:scale-110"
+                              }`}
+                              key={color.id}
+                              onClick={() =>
+                                setPackagingColors((current) => ({ ...current, [item.id]: color.id }))
+                              }
+                              style={{ backgroundColor: color.hex }}
+                              title={color.name}
+                              type="button"
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : null}
+                </article>
+              );
+            })}
           </div>
 
           <div className="grid gap-3">
@@ -121,7 +189,9 @@ export function BuilderModal({ open, onClose, onAdd }: BuilderModalProps) {
                   >
                     <Plus className="mb-2" size={16} />
                     {addon.name}
-                    <span className="block text-xs opacity-70">{formatPrice(addon.price)}</span>
+                    {addon.price > 0 ? (
+                      <span className="block text-xs opacity-70">{formatPrice(addon.price)}</span>
+                    ) : null}
                   </button>
                 );
               })}

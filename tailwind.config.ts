@@ -9,16 +9,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        milk: "#f8f2ea",
-        cream: "#fffaf4",
-        rose: "#d79aaa",
+        milk: "#fbf2f5",
+        cream: "#fffbfc",
+        rose: "#e8b8c6",
         sage: "#8fa58b",
-        wine: "#7b2d43",
-        ink: "#2f2725"
+        wine: "#9a5b70",
+        ink: "#44363b"
       },
       boxShadow: {
-        soft: "0 12px 30px rgba(87, 55, 47, 0.10)",
-        petal: "0 8px 18px rgba(123, 45, 67, 0.14)"
+        soft: "0 12px 30px rgba(125, 78, 93, 0.12)",
+        petal: "0 8px 18px rgba(154, 91, 112, 0.20)"
       },
       fontFamily: {
         sans: ["var(--font-manrope)", "system-ui", "sans-serif"],

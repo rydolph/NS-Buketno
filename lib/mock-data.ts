@@ -69,7 +69,7 @@ export const bouquets: Bouquet[] = [
     id: "bq-sage-garden",
     slug: "sage-garden",
     title: "Шалфейный Сад",
-    type: "bouquet",
+    type: "composition",
     category: "Сезонные",
     flowerType: "Смешанные",
     occasion: "Дом",
@@ -156,7 +156,7 @@ export const bouquets: Bouquet[] = [
     id: "bq-orchid-atelier",
     slug: "orchid-atelier",
     title: "Орхидейное Ателье",
-    type: "flowers",
+    type: "composition",
     category: "Авторские",
     flowerType: "Орхидеи",
     occasion: "Благодарность",
@@ -203,16 +203,49 @@ export const stems: FlowerStem[] = [
 ];
 
 export const constructorPackages: Packaging[] = [
-  { id: "kraft", name: "Молочный крафт", price: 350 },
-  { id: "silk", name: "Шелковая бумага", price: 650 },
-  { id: "box", name: "Премиум-коробка", price: 1600 }
+  {
+    id: "matte-film",
+    name: "Матовая пленка",
+    price: 350,
+    kind: "wrap",
+    colors: [
+      { id: "milk", name: "Молочная", hex: "#f5eee6" },
+      { id: "white", name: "Белая", hex: "#ffffff" },
+      { id: "powder", name: "Пудровая", hex: "#dfb6bd" },
+      { id: "blush", name: "Нежно-розовая", hex: "#f1cbd2" }
+    ]
+  },
+  {
+    id: "foamiran",
+    name: "Фоамиран",
+    price: 650,
+    kind: "wrap",
+    colors: [
+      { id: "milk", name: "Молочный", hex: "#f5eee6" },
+      { id: "white", name: "Белый", hex: "#ffffff" },
+      { id: "powder", name: "Пудровый", hex: "#dfb6bd" },
+      { id: "blush", name: "Нежно-розовый", hex: "#f1cbd2" }
+    ]
+  },
+  {
+    id: "satin-ribbon",
+    name: "Атласная лента",
+    price: 0,
+    kind: "decoration",
+    colors: [
+      { id: "milk", name: "Молочная", hex: "#f5eee6" },
+      { id: "white", name: "Белая", hex: "#ffffff" },
+      { id: "powder", name: "Пудровая", hex: "#dfb6bd" },
+      { id: "blush", name: "Нежно-розовая", hex: "#f1cbd2" }
+    ]
+  }
 ];
 
 export const addons: Addon[] = [
   { id: "card", name: "Открытка", price: 250 },
-  { id: "ribbon", name: "Шелковая лента", price: 300 },
-  { id: "toy", name: "Мягкая игрушка", price: 1450 },
-  { id: "sweets", name: "Макаруны", price: 1200 }
+  { id: "organza", name: "Органза", price: 300 },
+  { id: "tissue", name: "Тишью", price: 0 },
+  { id: "bouquet-carrier", name: "Переноска для букета", price: 0 }
 ];
 
 export const testOrders: Order[] = [

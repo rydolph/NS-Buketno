@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { bouquets as mockBouquets, testUser } from "@/lib/mock-data";
 import { readStorage, writeStorage } from "@/lib/storage";
-import type { Bouquet, CartItem, ChatMessage, CookieSettings, InventoryDelivery, Order, PromoCode, Review, User } from "@/types/shop";
+import type { Bouquet, CartItem, ChatMessage, CookieSettings, InventoryDelivery, Order, PaymentMethod, PromoCode, Review, User } from "@/types/shop";
 
 const cartKey = (userId: string) => `ns-buketno.cart.${userId}`;
 const USER_KEY = "lumiere.user";
@@ -400,7 +400,12 @@ export function useShop() {
   }, []);
 
   const placeOrder = useCallback(
-    (details: { address: string }) => {
+    (details: {
+      address: string;
+      deliveryDate: string;
+      deliveryTimeSlot: string;
+      paymentMethod: PaymentMethod;
+    }) => {
       if (!user || cart.length === 0) {
         return null;
       }
@@ -416,8 +421,11 @@ export function useShop() {
         id: orderId,
         customerEmail: user.email,
         date: new Date().toISOString().slice(0, 10),
-        status: "Завершен",
+        status: details.paymentMethod === "При получении" ? "Ожидает оплаты" : "Завершен",
         deliveryAddress: details.address,
+        deliveryDate: details.deliveryDate,
+        deliveryTimeSlot: details.deliveryTimeSlot,
+        paymentMethod: details.paymentMethod,
         total: cartTotal,
         items: cart,
         chat: createOrderChat(orderId)

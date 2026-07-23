@@ -79,6 +79,11 @@ export function Catalog({ bouquets, filters, favoriteIds, onOpen, onAdd, onFavor
                 label="Цветы"
                 onClick={() => update("productType", "flowers")}
               />
+              <Segment
+                active={filters.productType === "composition"}
+                label="Композиции"
+                onClick={() => update("productType", "composition")}
+              />
             </FilterGroup>
 
             <FilterSelect label="Категория" value={filters.category} values={categories} onChange={(value) => update("category", value as CatalogFilters["category"])} />
@@ -131,7 +136,7 @@ export function Catalog({ bouquets, filters, favoriteIds, onOpen, onAdd, onFavor
           </div>
         </aside>
 
-        <section className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4" aria-label="Каталог цветов и букетов">
+        <section className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4" aria-label="Каталог цветов, букетов и композиций">
           {bouquets.map((bouquet, index) => {
             const favorite = favoriteIds.includes(bouquet.id);
 

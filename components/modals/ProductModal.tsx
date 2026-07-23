@@ -65,6 +65,7 @@ export function ProductModal({
     return null;
   }
 
+  const productTypeLabel = bouquet.type === "composition" ? "Композиция" : "Готовый букет";
   const item: CartItem = {
     id: `${bouquet.id}-${stemOption}-${pack}`,
     bouquetId: bouquet.id,
@@ -73,7 +74,7 @@ export function ProductModal({
     price,
     quantity: editingItem?.quantity || 1,
     meta: [
-      bouquet.type === "flowers" && bouquet.stemOptions ? `${bouquet.stemOptions[stemOption]} стеблей` : "Готовый букет",
+      bouquet.type === "flowers" && bouquet.stemOptions ? `${bouquet.stemOptions[stemOption]} стеблей` : productTypeLabel,
       bouquet.packages[pack].label
     ]
   };
@@ -91,7 +92,7 @@ export function ProductModal({
         <div className="grid gap-4 sm:gap-5">
           <div>
             <p className="mb-2 text-sm uppercase text-wine/70">
-              {bouquet.type === "bouquet" ? "Готовый букет" : "Цветы"} · {bouquet.category}
+              {bouquet.type === "flowers" ? "Цветы" : productTypeLabel} · {bouquet.category}
             </p>
             <div className="flex flex-wrap items-end justify-between gap-3">
               <h3 className="font-serif text-3xl text-ink sm:text-4xl">{bouquet.title}</h3>

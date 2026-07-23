@@ -1,4 +1,6 @@
-export type ProductType = "bouquet" | "flowers";
+export type ProductType = "bouquet" | "flowers" | "composition";
+
+export type PaymentMethod = "Карта онлайн" | "При получении" | "Сертификат бутика";
 
 export type BouquetCategory = "Розы" | "Пионы" | "Сезонные" | "Авторские" | "Премиум";
 
@@ -60,10 +62,18 @@ export type Addon = {
   price: number;
 };
 
+export type ColorOption = {
+  id: string;
+  name: string;
+  hex: string;
+};
+
 export type Packaging = {
   id: string;
   name: string;
   price: number;
+  kind: "wrap" | "decoration";
+  colors: ColorOption[];
 };
 
 export type Review = {
@@ -121,6 +131,9 @@ export type Order = {
   items: CartItem[];
   total: number;
   deliveryAddress: string;
+  deliveryDate?: string;
+  deliveryTimeSlot?: string;
+  paymentMethod?: PaymentMethod;
   chat: ChatThread;
 };
 

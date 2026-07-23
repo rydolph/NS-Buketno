@@ -179,7 +179,7 @@ export function CartDrawer({ open, cart, products, getAvailableQuantity, promoCo
                 </div>
               </div>
               <button
-                className="h-12 w-full rounded-[8px] bg-wine px-4 text-sm font-semibold text-white shadow-petal transition hover:bg-[#69233a] focus:outline-none focus:ring-2 focus:ring-wine/35 disabled:cursor-not-allowed disabled:opacity-55"
+                className="h-12 w-full rounded-[8px] bg-wine px-4 text-sm font-semibold text-white shadow-petal transition hover:bg-[#844b5f] focus:outline-none focus:ring-2 focus:ring-wine/35 disabled:cursor-not-allowed disabled:opacity-55"
                 disabled={!canCheckout}
                 onClick={onCheckout}
                 type="button"

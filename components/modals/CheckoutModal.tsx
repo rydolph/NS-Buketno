@@ -4,14 +4,52 @@ import { useEffect, useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { formatPrice } from "@/lib/mock-data";
 import { Field, Modal, PrimaryButton, SecondaryButton, Textarea } from "@/components/ui";
-import type { Order, User } from "@/types/shop";
+import type { Order, PaymentMethod, User } from "@/types/shop";
 
 type CheckoutModalProps = {
   open: boolean;
   user: User | null;
   total: number;
   onClose: () => void;
-  onPay: (details: { address: string }) => Order | null;
+  onPay: (details: {
+    address: string;
+    deliveryDate: string;
+    deliveryTimeSlot: string;
+    paymentMethod: PaymentMethod;
+  }) => Order | null;
+};
+
+const DELIVERY_TIME_SLOTS = Array.from({ length: 12 }, (_, index) => {
+  const startHour = 9 + index;
+  const endHour = startHour + 2;
+  const value = `${String(startHour).padStart(2, "0")}:00–${String(endHour).padStart(2, "0")}:00`;
+
+  return { startHour, value };
+});
+
+const formatLocalDate = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const getAvailableTimeSlots = (deliveryDate: string, now: Date) => {
+  const today = formatLocalDate(now);
+
+  if (!deliveryDate || deliveryDate < today) {
+    return [];
+  }
+
+  if (deliveryDate > today) {
+    return DELIVERY_TIME_SLOTS;
+  }
+
+  return DELIVERY_TIME_SLOTS.filter(({ startHour }) => {
+    const slotStart = new Date(now);
+    slotStart.setHours(startHour, 0, 0, 0);
+    return slotStart.getTime() > now.getTime();
+  });
 };
 
 export function CheckoutModal({ open, user, total, onClose, onPay }: CheckoutModalProps) {
@@ -19,15 +57,19 @@ export function CheckoutModal({ open, user, total, onClose, onPay }: CheckoutMod
   const [phone, setPhone] = useState(user?.phone || "");
   const [email, setEmail] = useState(user?.email || "");
   const [address, setAddress] = useState(user?.addresses[0] || "");
-  const [delivery, setDelivery] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState("");
+  const [deliveryTimeSlot, setDeliveryTimeSlot] = useState("");
+  const [deliveryError, setDeliveryError] = useState("");
   const [comment, setComment] = useState("");
-  const [payment, setPayment] = useState("Карта онлайн");
+  const [payment, setPayment] = useState<PaymentMethod>("Карта онлайн");
   const [success, setSuccess] = useState<Order | null>(null);
 
   useEffect(() => {
     if (!open) {
       setSuccess(null);
-      setDelivery("");
+      setDeliveryDate("");
+      setDeliveryTimeSlot("");
+      setDeliveryError("");
       setComment("");
       return;
     }
@@ -42,11 +84,31 @@ export function CheckoutModal({ open, user, total, onClose, onPay }: CheckoutMod
 
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
-    const order = onPay({ address });
+    const now = new Date();
+    const today = formatLocalDate(now);
+
+    if (!deliveryDate || deliveryDate < today) {
+      setDeliveryError("Выберите сегодняшнюю или будущую дату доставки.");
+      return;
+    }
+
+    const availableTimeSlots = getAvailableTimeSlots(deliveryDate, now);
+    if (!availableTimeSlots.some(({ value }) => value === deliveryTimeSlot)) {
+      setDeliveryError("Выберите доступный двухчасовой интервал доставки.");
+      return;
+    }
+
+    setDeliveryError("");
+    const order = onPay({ address, deliveryDate, deliveryTimeSlot, paymentMethod: payment });
     if (order) {
       setSuccess(order);
     }
   };
+
+  const now = new Date();
+  const minDeliveryDate = formatLocalDate(now);
+  const availableTimeSlots = getAvailableTimeSlots(deliveryDate, now);
+  const isPayOnDelivery = payment === "При получении";
 
   return (
     <Modal open={open} title={success ? "Заказ оформлен" : "Оформление заказа"} onClose={onClose} wide>
@@ -56,7 +118,9 @@ export function CheckoutModal({ open, user, total, onClose, onPay }: CheckoutMod
           <div>
             <h3 className="font-serif text-3xl text-ink sm:text-4xl">Спасибо за заказ</h3>
             <p className="mt-3 text-ink/65">
-              Заказ {success.id} сохранен в истории профиля. Mock-оплата прошла успешно.
+              {success.paymentMethod === "При получении"
+                ? `Заказ ${success.id} сохранен в истории профиля. Оплатите ${formatPrice(success.total)} при получении.`
+                : `Заказ ${success.id} сохранен в истории профиля. Mock-оплата прошла успешно.`}
             </p>
           </div>
           <PrimaryButton onClick={onClose}>Вернуться в каталог</PrimaryButton>
@@ -67,12 +131,57 @@ export function CheckoutModal({ open, user, total, onClose, onPay }: CheckoutMod
             <Field label="Имя" onChange={setName} required value={name} />
             <Field label="Телефон" onChange={setPhone} required value={phone} />
             <Field label="Email" onChange={setEmail} required type="email" value={email} />
-            <Field label="Дата и время доставки" onChange={setDelivery} required type="datetime-local" value={delivery} />
+            <label className="grid gap-2 text-sm font-medium text-ink">
+              Дата доставки
+              <input
+                aria-describedby={deliveryError ? "delivery-error" : undefined}
+                className="h-12 rounded-[8px] border border-wine/10 bg-white/75 px-4 text-sm outline-none transition focus:border-wine/35 focus:ring-4 focus:ring-rose/15"
+                min={minDeliveryDate}
+                onChange={(event) => {
+                  setDeliveryDate(event.target.value);
+                  setDeliveryTimeSlot("");
+                  setDeliveryError("");
+                }}
+                required
+                type="date"
+                value={deliveryDate}
+              />
+            </label>
+            <label className="grid gap-2 text-sm font-medium text-ink">
+              Интервал доставки
+              <select
+                aria-describedby={deliveryError ? "delivery-error" : undefined}
+                className="h-12 rounded-[8px] border border-wine/10 bg-white/75 px-4 text-sm outline-none transition focus:border-wine/35 focus:ring-4 focus:ring-rose/15 disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={!deliveryDate || availableTimeSlots.length === 0}
+                onChange={(event) => {
+                  setDeliveryTimeSlot(event.target.value);
+                  setDeliveryError("");
+                }}
+                required
+                value={deliveryTimeSlot}
+              >
+                <option value="">
+                  {!deliveryDate
+                    ? "Сначала выберите дату"
+                    : availableTimeSlots.length
+                      ? "Выберите интервал"
+                      : "На эту дату интервалов не осталось"}
+                </option>
+                {availableTimeSlots.map(({ value }) => (
+                  <option key={value} value={value}>{value}</option>
+                ))}
+              </select>
+            </label>
+            {deliveryError ? (
+              <p className="text-sm text-wine sm:col-span-2" id="delivery-error" role="alert">
+                {deliveryError}
+              </p>
+            ) : null}
             <label className="grid gap-2 text-sm font-medium text-ink sm:col-span-2">
               Способ оплаты
               <select
                 className="h-12 rounded-[8px] border border-wine/10 bg-white/75 px-4 text-sm outline-none transition focus:border-wine/35 focus:ring-4 focus:ring-rose/15"
-                onChange={(event) => setPayment(event.target.value)}
+                onChange={(event) => setPayment(event.target.value as PaymentMethod)}
                 value={payment}
               >
                 <option>Карта онлайн</option>
@@ -91,10 +200,17 @@ export function CheckoutModal({ open, user, total, onClose, onPay }: CheckoutMod
               <span>{payment}</span>
             </div>
             <div className="flex justify-between text-xl font-semibold text-ink">
-              <span>К оплате</span>
+              <span>{isPayOnDelivery ? "При получении" : "К оплате"}</span>
               <span>{formatPrice(total)}</span>
             </div>
-            <PrimaryButton disabled={!total} type="submit">Оплатить</PrimaryButton>
+            {isPayOnDelivery ? (
+              <p className="rounded-[8px] bg-white/75 p-3 text-sm leading-5 text-ink/65">
+                Сейчас списания не будет. Оплата — при передаче заказа.
+              </p>
+            ) : null}
+            <PrimaryButton disabled={!total} type="submit">
+              {isPayOnDelivery ? "Оформить заказ" : "Оплатить"}
+            </PrimaryButton>
             <SecondaryButton onClick={onClose}>Отмена</SecondaryButton>
           </aside>
         </form>

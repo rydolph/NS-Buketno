@@ -10,9 +10,10 @@ type ModalProps = {
   onClose: () => void;
   children: React.ReactNode;
   wide?: boolean;
+  fullScreen?: boolean;
 };
 
-export function Modal({ open, title, onClose, children, wide }: ModalProps) {
+export function Modal({ open, title, onClose, children, wide, fullScreen }: ModalProps) {
   useEffect(() => {
     if (!open) {
       return;
@@ -33,7 +34,9 @@ export function Modal({ open, title, onClose, children, wide }: ModalProps) {
       {open ? (
         <motion.div
           aria-modal="true"
-          className="fixed inset-0 z-50 grid place-items-end bg-ink/45 p-0 sm:place-items-center sm:p-6"
+          className={`fixed inset-0 z-50 grid bg-ink/45 ${
+            fullScreen ? "place-items-stretch p-0" : "place-items-end p-0 sm:place-items-center sm:p-6"
+          }`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -42,8 +45,12 @@ export function Modal({ open, title, onClose, children, wide }: ModalProps) {
           onMouseDown={onClose}
         >
           <motion.div
-            className={`max-h-[96vh] w-full overflow-hidden rounded-t-[8px] bg-cream shadow-soft outline-none will-change-transform sm:max-h-[92vh] sm:rounded-[8px] ${
-              wide ? "sm:max-w-6xl" : "sm:max-w-xl"
+            className={`flex w-full flex-col overflow-hidden bg-cream shadow-soft outline-none will-change-transform ${
+              fullScreen
+                ? "h-dvh max-h-none rounded-none sm:h-dvh sm:max-h-none sm:max-w-none sm:rounded-none"
+                : `max-h-[96vh] rounded-t-[8px] sm:max-h-[92vh] sm:rounded-[8px] ${
+                    wide ? "sm:max-w-6xl" : "sm:max-w-xl"
+                  }`
             }`}
             initial={{ y: 24, opacity: 0, scale: 0.98 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
@@ -63,7 +70,15 @@ export function Modal({ open, title, onClose, children, wide }: ModalProps) {
                 <X size={20} />
               </button>
             </div>
-            <div className="max-h-[calc(96vh-65px)] overflow-y-auto sm:max-h-[calc(92vh-73px)]">{children}</div>
+            <div
+              className={
+                fullScreen
+                  ? "min-h-0 flex-1 overflow-y-auto"
+                  : "max-h-[calc(96vh-65px)] overflow-y-auto sm:max-h-[calc(92vh-73px)]"
+              }
+            >
+              {children}
+            </div>
           </motion.div>
         </motion.div>
       ) : null}
@@ -109,7 +124,7 @@ export function PrimaryButton({
 }) {
   return (
     <button
-      className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full bg-wine px-3 py-2 text-[12px] font-semibold leading-tight text-white shadow-petal transition hover:bg-[#69233a] focus:outline-none focus:ring-2 focus:ring-wine/35 disabled:cursor-not-allowed disabled:opacity-55 sm:min-h-11 sm:gap-2 sm:px-5 sm:text-sm"
+      className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full bg-wine px-3 py-2 text-[12px] font-semibold leading-tight text-white shadow-petal transition hover:bg-[#844b5f] focus:outline-none focus:ring-2 focus:ring-wine/35 disabled:cursor-not-allowed disabled:opacity-55 sm:min-h-11 sm:gap-2 sm:px-5 sm:text-sm"
       disabled={disabled}
       onClick={onClick}
       type={type}
